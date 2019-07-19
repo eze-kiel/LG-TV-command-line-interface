@@ -15,7 +15,9 @@ import (
 type fn func(...string) (string, error)
 
 //define the IP and the port used by the TV on the network
-const serverHost = "192.168.42.63"
+const serverHost = "127.0.0.1"
+
+// const serverHost = "192.168.42.63"
 const serverPort = "9761" //by default, this is the port used by LG
 
 /*
@@ -25,16 +27,22 @@ TODO:
  -loglevel
 */
 
+var m map[string]fn
+
+func initializeCommands() {
+	m = map[string]fn{
+		"mute":   mute,
+		"volume": volume,
+	}
+}
+
 func main() {
 	log.SetLevel(log.DebugLevel)
 
 	//This map uses the fn type introduced before
 	//We create a map called m which associates a string keyword (between [])
 	// with a function which is build following the fn type
-	m := map[string]fn{
-		"mute":   mute,
-		"volume": volume,
-	}
+	initializeCommands()
 
 	// f represents a function associated with the first argument given to the program
 	// so by entering "mute" as first arg, thanks to the m map, f represents
@@ -79,7 +87,7 @@ func sendCommand(srv string, port string, command string) error {
 	_, err = io.Copy(conn, r)
 
 	if err != nil {
-		return fmt.Errorf("Connection error: %s\n", err)
+		return fmt.Errorf("Connection error: %d", err)
 	}
 
 	return nil
@@ -108,8 +116,8 @@ func volume(vals ...string) (string, error) {
 	}
 
 	if value < 0 || value > 100 {
-		return "", fmt.Errorf("invalid value: %s", value)
+		return "", fmt.Errorf("invalid value: %d", value)
 	}
 	// append the variable part of the function to the fixed one
-	return fmt.Sprintf("kf 00 %x", value), nil
+	return fmt.Sprintf("kf 00 %.2x", value), nil
 }
