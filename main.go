@@ -1,60 +1,98 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"io"
+	"io" // "log"
 	"net"
+	"os"
+	"strconv"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
+
+type fn func(...string) (string, error)
 
 //define the IP and the port used by the TV on the network
 const serverHost = "192.168.42.63"
 const serverPort = "9761" //by default, this is the port used by LG
 
-//Manage command line arguments
-var (
-	mute = flag.String("mute", "", "Boolean value : true ==  muted")
-	volume = flag.Int("volume", 200, "Apply the volume value : must be between 0 and 100")
-)
+/*
+TODO:
+ -server
+ -port
+ -loglevel
+*/
 
 func main() {
-	flag.Parse()
+	log.SetLevel(log.DebugLevel)
 
-	fmt.Println(*volume)
-
-	if *mute != "" {
-		if *mute == "true" {
-			startClient(fmt.Sprintf("%s:%s", serverHost, serverPort), "ke 00 00\n")
-		} else {
-			startClient(fmt.Sprintf("%s:%s", serverHost, serverPort), "ke 00 01\n")
-		}
+	m := map[string]fn{
+		"mute":   mute,
+		"volume": volume,
 	}
 
-	if !(*volume < 0 || *volume > 100) {
-		volumeInHexa := fmt.Sprintf("%x", *volume)
-
-		startClient(fmt.Sprintf("%s:%s", serverHost, serverPort), fmt.Sprintf("kf 00 %s\n", volumeInHexa))
+	f := m[os.Args[1]]
+	if f == nil {
+		fmt.Printf("Error: unable to find command %s", os.Args[1])
 	}
 
+	command, err := f(os.Args[2:]...)
+
+	if err != nil {
+		log.Fatalf(`Error: unable retrieve command for "%s"`, os.Args[1])
+	}
+
+	err = sendCommand(serverHost, serverPort, command)
+
+	if err != nil {
+		log.Error("Failed to send command: %v", err)
+	}
 }
 
 //This function initiate a connection between the computer and the TV
 //It takes in parameters a string composed of the TV's IP and the port used
-func startClient(addr string, command string) {
-	fmt.Println("Trying to connect to the TV...")
+func sendCommand(srv string, port string, command string) error {
+	r := strings.NewReader(command + "\n")
 
-	r := strings.NewReader(command)
-
-	conn, err := net.Dial("tcp", addr)
+	log.Debugf("connecting to TV at %s:%s", srv, port)
+	conn, err := net.Dial("tcp", fmt.Sprintf("%s:%s", srv, port))
 	if err != nil {
 		fmt.Printf("Can't connect to server: %s\n", err)
-		return
-	}
-	_, err = io.Copy(conn, r)
-	if err != nil {
-		fmt.Printf("Connection error: %s\n", err)
+		return nil
 	}
 
-	fmt.Println("End")
+	log.Debugf(`sending command "%s" to TV`, command)
+	_, err = io.Copy(conn, r)
+
+	if err != nil {
+		return fmt.Errorf("Connection error: %s\n", err)
+	}
+
+	return nil
+}
+
+func mute(vals ...string) (string, error) {
+	if vals[0] == "" {
+		return "", fmt.Errorf("invalid mute value provided: %s", vals[0])
+	}
+
+	if vals[0] == "true" {
+		return "ke 00 00", nil
+	} else {
+		return "ke 00 01", nil
+	}
+}
+
+func volume(vals ...string) (string, error) {
+	value, err := strconv.ParseInt(vals[0], 10, 64)
+
+	if err != nil {
+		return "", err
+	}
+
+	if value < 0 || value > 100 {
+		return "", fmt.Errorf("invalid value: %s", value)
+	}
+	return fmt.Sprintf("kf 00 %x", value), nil
 }
