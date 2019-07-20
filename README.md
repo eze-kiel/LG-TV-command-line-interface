@@ -15,5 +15,8 @@ GOOS=windows go build main.go -o cli-lg
 
 Example of use :
 ```bash
-./cli-lg <volume> <50> #this will set the volume at 50
+./cli-lg volume 50 #this will set the volume at 50
 ```
+
+### Note
+For now, you must have an environement variable 'LGIP' which contain the IP of the LG television you want to control.
