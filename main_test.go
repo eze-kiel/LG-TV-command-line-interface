@@ -16,6 +16,7 @@ func TestCommands(t *testing.T) {
 		{"volume", "10", "kf 00 0a"},
 		{"volume", "0", "kf 00 00"},
 		{"volume", "100", "kf 00 64"},
+		{"poweroff", "", "ka 00 00"},
 	}
 
 	initializeCommands()

@@ -34,8 +34,9 @@ var m map[string]fn
 // with a function which is build following the fn type
 func initializeCommands() {
 	m = map[string]fn{
-		"mute":   mute,
-		"volume": volume,
+		"mute":     mute,
+		"volume":   volume,
+		"poweroff": poweroff,
 	}
 }
 
@@ -99,6 +100,7 @@ func sendCommand(srv string, port string, command string) error {
 	return nil
 }
 
+// set the mute setting (true/false)
 func mute(vals ...string) (string, error) {
 	if vals[0] == "" {
 		return "", fmt.Errorf("invalid mute value provided: %s", vals[0])
@@ -113,6 +115,7 @@ func mute(vals ...string) (string, error) {
 	return "ke 00 01", nil
 }
 
+// set the volume (0-100)
 func volume(vals ...string) (string, error) {
 	// convert the string into a int
 	value, err := strconv.ParseInt(vals[0], 10, 64)
@@ -126,6 +129,11 @@ func volume(vals ...string) (string, error) {
 	}
 	// append the variable part of the function to the fixed one
 	return fmt.Sprintf("kf 00 %.2x", value), nil
+}
+
+// turn off the screen (no param)
+func poweroff(vals ...string) (string, error) {
+	return "ka 00 00", nil
 }
 
 func checkEnvIP() string {
