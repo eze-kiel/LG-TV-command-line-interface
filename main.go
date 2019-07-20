@@ -15,7 +15,7 @@ import (
 type fn func(...string) (string, error)
 
 //define the IP and the port used by the TV on the network
-const serverHost = "127.0.0.1"
+//const serverHost = "127.0.0.1"
 
 // const serverHost = "192.168.42.63"
 const serverPort = "9761" //by default, this is the port used by LG
@@ -29,6 +29,9 @@ TODO:
 
 var m map[string]fn
 
+//This map uses the fn type introduced before
+//We create a map called m which associates a string keyword (between [])
+// with a function which is build following the fn type
 func initializeCommands() {
 	m = map[string]fn{
 		"mute":   mute,
@@ -39,9 +42,12 @@ func initializeCommands() {
 func main() {
 	log.SetLevel(log.DebugLevel)
 
-	//This map uses the fn type introduced before
-	//We create a map called m which associates a string keyword (between [])
-	// with a function which is build following the fn type
+	// check for an existing IP in the environement variables, under the name LGIP
+	serverHost := checkEnvIP()
+	if serverHost == "" {
+		log.Fatalf("No IP found in environement variables")
+	}
+
 	initializeCommands()
 
 	// f represents a function associated with the first argument given to the program
@@ -101,10 +107,10 @@ func mute(vals ...string) (string, error) {
 	if vals[0] == "true" {
 		// mute the sound
 		return "ke 00 00", nil
-	} else {
-		// unmute the sound
-		return "ke 00 01", nil
 	}
+
+	// unmute the sound
+	return "ke 00 01", nil
 }
 
 func volume(vals ...string) (string, error) {
@@ -120,4 +126,11 @@ func volume(vals ...string) (string, error) {
 	}
 	// append the variable part of the function to the fixed one
 	return fmt.Sprintf("kf 00 %.2x", value), nil
+}
+
+func checkEnvIP() string {
+	if os.Getenv("LGIP") != "" {
+		return os.Getenv("LGIP")
+	}
+	return ""
 }
