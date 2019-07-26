@@ -18,5 +18,8 @@ Example of use :
 ./cli-lg volume 50 #this will set the volume at 50
 ```
 
-### Note
-For now, you must have an environement variable 'LGIP' which contain the IP of the LG television you want to control.
+### Configuration
+You have to specify the IP of your TV in the config.yaml file.
+
+### Future
+The possibility to choose the input port via the config file will be added soon
