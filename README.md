@@ -4,13 +4,13 @@ Tool designed to send commands to a LG television via TCP/IP. Currently working 
 ### Usage
 For Linux :
 ```bash
-GOOS=linux go build main.go -o cli-lg 
+GOOS=linux go build -o cli-lg 
 ./cli-lg <func> <value>
 ```
 
 For Windows :
 ```bash
-GOOS=windows go build main.go -o cli-lg 
+GOOS=windows go build -o cli-lg 
 ./cli-lg <func> <value>
 ```
 
