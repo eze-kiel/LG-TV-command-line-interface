@@ -29,10 +29,12 @@ var m map[string]fn
 // with a function which is build following the fn type
 func initializeCommands() {
 	m = map[string]fn{
-		"mute":     mute,
-		"volume":   volume,
-		"poweroff": poweroff,
-		"input":    input,
+		"mute":       mute,
+		"volume":     volume,
+		"poweroff":   poweroff,
+		"input":      input,
+		"contrast":   contrast,
+		"brightness": brightness,
 	}
 }
 
@@ -162,4 +164,34 @@ func inConfigFile(param string) interface{} {
 	}
 
 	return viper.Get(param)
+}
+
+func contrast(vals ...string) (string, error) {
+	// convert the string into a int
+	value, err := strconv.ParseInt(vals[0], 10, 64)
+
+	if err != nil {
+		return "", err
+	}
+
+	if value < 0 || value > 100 {
+		return "", fmt.Errorf("invalid value: %d", value)
+	}
+	// append the variable part of the function to the fixed one
+	return fmt.Sprintf("kg 00 %.2x", value), nil
+}
+
+func brightness(vals ...string) (string, error) {
+	// convert the string into a int
+	value, err := strconv.ParseInt(vals[0], 10, 64)
+
+	if err != nil {
+		return "", err
+	}
+
+	if value < 0 || value > 100 {
+		return "", fmt.Errorf("invalid value: %d", value)
+	}
+	// append the variable part of the function to the fixed one
+	return fmt.Sprintf("kh 00 %.2x", value), nil
 }
