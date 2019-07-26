@@ -148,6 +148,9 @@ func input(vals ...string) (string, error) {
 	case "rgb":
 		return "xb 00 60", nil
 
+	case "dvi":
+		return "xb 00 70", nil
+
 	default:
 		return "", fmt.Errorf("No input found")
 	}
