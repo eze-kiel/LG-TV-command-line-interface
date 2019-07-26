@@ -19,7 +19,7 @@ type fn func(...string) (string, error)
 //const serverHost = "127.0.0.1"
 
 // const serverHost = "192.168.42.63"
-const serverPort = "9761" //by default, this is the port used by LG
+//const serverPort = "9761" //by default, this is the port used by LG
 
 /*
 TODO:
@@ -45,13 +45,6 @@ func initializeCommands() {
 func main() {
 	log.SetLevel(log.DebugLevel)
 
-	/*
-		// check for an existing IP in the environement variables, under the name LGIP
-		serverHost := checkEnvIP()
-		if serverHost == "" {
-			log.Fatalf("No IP found in environement variables")
-		}*/
-
 	// set the viper options to read config.yaml
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
@@ -63,11 +56,9 @@ func main() {
 		log.Fatalf("Impossible to read conf file: %v", err)
 	}
 
-	// check if an IP is defined in the config file
-	if viper.Get("ip") == nil {
-		log.Fatalf("No IP found in config file")
-	}
-	serverHost := viper.Get("ip")
+	serverHost := inConfigFile("ip").(string)
+	serverPort := inConfigFile("port").(string)
+
 	fmt.Printf("%s", serverHost)
 
 	initializeCommands()
@@ -89,7 +80,7 @@ func main() {
 	}
 
 	// the sendCommand function is used. This one just send the command to the server (TV)
-	err = sendCommand(serverHost.(string), serverPort, command)
+	err = sendCommand(serverHost, serverPort, command)
 
 	if err != nil {
 		log.Error("Failed to send command: %v", err)
@@ -175,4 +166,12 @@ func input(vals ...string) (string, error) {
 	default:
 		return "", fmt.Errorf("No input found")
 	}
+}
+
+func inConfigFile(param string) interface{} {
+	if viper.Get(param) == nil {
+		return fmt.Sprintf("%s not found in config file", param)
+	}
+
+	return viper.Get(param)
 }
