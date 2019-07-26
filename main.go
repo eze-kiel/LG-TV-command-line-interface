@@ -165,12 +165,14 @@ func checkEnvIP() string {
 }
 
 func input(vals ...string) (string, error) {
-	if strings.ToLower(vals[0]) == "hdmi1" {
+	switch strings.ToLower(vals[0]) {
+	case "hdmi1":
 		return "xb 00 a0", nil
-	}
 
-	if strings.ToLower(vals[0]) == "rgb" {
+	case "rgb":
 		return "xb 00 60", nil
+
+	default:
+		return "", fmt.Errorf("No input found")
 	}
-	return "", fmt.Errorf("No input found")
 }
