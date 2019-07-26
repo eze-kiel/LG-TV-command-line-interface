@@ -15,12 +15,6 @@ import (
 //this type represent a variadic func which returns a string and the error
 type fn func(...string) (string, error)
 
-//define the IP and the port used by the TV on the network
-//const serverHost = "127.0.0.1"
-
-// const serverHost = "192.168.42.63"
-//const serverPort = "9761" //by default, this is the port used by LG
-
 /*
 TODO:
  -server
@@ -58,8 +52,6 @@ func main() {
 
 	serverHost := inConfigFile("ip").(string)
 	serverPort := inConfigFile("port").(string)
-
-	fmt.Printf("%s", serverHost)
 
 	initializeCommands()
 
@@ -146,13 +138,6 @@ func volume(vals ...string) (string, error) {
 // turn off the screen (no param)
 func poweroff(vals ...string) (string, error) {
 	return "ka 00 00", nil
-}
-
-func checkEnvIP() string {
-	if os.Getenv("LGIP") != "" {
-		return os.Getenv("LGIP")
-	}
-	return ""
 }
 
 func input(vals ...string) (string, error) {
