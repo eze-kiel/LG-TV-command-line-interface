@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 //this type represent a variadic func which returns a string and the error
@@ -43,11 +44,30 @@ func initializeCommands() {
 func main() {
 	log.SetLevel(log.DebugLevel)
 
-	// check for an existing IP in the environement variables, under the name LGIP
-	serverHost := checkEnvIP()
-	if serverHost == "" {
-		log.Fatalf("No IP found in environement variables")
+	/*
+		// check for an existing IP in the environement variables, under the name LGIP
+		serverHost := checkEnvIP()
+		if serverHost == "" {
+			log.Fatalf("No IP found in environement variables")
+		}*/
+
+	// set the viper options to read config.yaml
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	viper.SetConfigType("yaml")
+
+	// check if config.yaml exists
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatalf("Impossible to read conf file: %v", err)
 	}
+
+	// check if an IP is defined in the config file
+	if viper.Get("ip") == nil {
+		log.Fatalf("No IP found in config file")
+	}
+	serverHost := viper.Get("ip")
+	fmt.Printf("%s", serverHost)
 
 	initializeCommands()
 
@@ -68,7 +88,7 @@ func main() {
 	}
 
 	// the sendCommand function is used. This one just send the command to the server (TV)
-	err = sendCommand(serverHost, serverPort, command)
+	err = sendCommand(serverHost.(string), serverPort, command)
 
 	if err != nil {
 		log.Error("Failed to send command: %v", err)
