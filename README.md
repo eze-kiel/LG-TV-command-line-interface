@@ -20,7 +20,7 @@ Example of use :
 ```
 
 ### Configuration
-You have to specify the IP of your TV in the config.yaml file.
+You have to specify the IP of your TV and the port used in the config.yaml file. By default, the port used should be 9761 or 9760.
 
 ### Functions
 ```bash
