@@ -38,6 +38,7 @@ func initializeCommands() {
 		"mute":     mute,
 		"volume":   volume,
 		"poweroff": poweroff,
+		"input":    input,
 	}
 }
 
@@ -161,4 +162,15 @@ func checkEnvIP() string {
 		return os.Getenv("LGIP")
 	}
 	return ""
+}
+
+func input(vals ...string) (string, error) {
+	if strings.ToLower(vals[0]) == "hdmi1" {
+		return "xb 00 a0", nil
+	}
+
+	if strings.ToLower(vals[0]) == "rgb" {
+		return "xb 00 60", nil
+	}
+	return "", fmt.Errorf("No input found")
 }
