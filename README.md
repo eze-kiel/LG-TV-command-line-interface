@@ -5,13 +5,13 @@ Tool designed to send commands to a LG television via TCP/IP. Currently working 
 For Linux :
 ```bash
 GOOS=linux go build main.go -o cli-lg 
-./cli-lg <param> <value>
+./cli-lg <func> <value>
 ```
 
 For Windows :
 ```bash
 GOOS=windows go build main.go -o cli-lg 
-./cli-lg <param> <value>
+./cli-lg <func> <value>
 ```
 
 Example of use :
@@ -25,6 +25,8 @@ You have to specify the IP of your TV and the port used in the config.yaml file.
 ### Functions
 ```bash
 volume <value> #value between 0 and 100
+brightness <value> #value between 0 and 100
+contrast <value> #value between 0 and 100
 mute <state> #boolean state
 input <value> #HDMI1, RGB... Note that this field is case insensitive
 poweroff #turn off the screen
