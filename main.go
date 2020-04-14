@@ -77,7 +77,7 @@ func main() {
 	err = sendCommand(serverHost, serverPort, command)
 
 	if err != nil {
-		log.Error("Failed to send command: %v", err)
+		log.Error("Failed to send command: ", err)
 	}
 }
 
