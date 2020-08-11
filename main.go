@@ -97,6 +97,19 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:  "contrast",
+			Usage: "Adjusts the contrast of the screen. The value must be in 0-100",
+			Action: func(c *cli.Context) error {
+				contrVal := c.Args().First()
+				contrValInt, _ := strconv.Atoi(contrVal)
+				err := sendCommand(serverHost, serverPort, fmt.Sprintf("kg 00 %.2x", contrValInt))
+				if err != nil {
+					return err
+				}
+				return nil
+			},
+		},
 	}
 
 	// Sort commands list in help panel by name
